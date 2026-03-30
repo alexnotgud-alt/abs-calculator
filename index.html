@@ -3,8 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABS CALCULATOR — Body Composition Timeline</title>
+<title>ABS Calculator — When Will You Get Abs?</title>
+<!-- SEO -->
+<meta name="description" content="Find out exactly when you'll get abs. Enter your stats and get a day-by-day fat loss timeline — free, no sign-up required.">
 
+<!-- Open Graph (for link previews on WhatsApp, Discord, social) -->
+<meta property="og:title" content="ABS Calculator — When Will You Get Abs?">
+<meta property="og:description" content="Precision body composition timeline. Enter your body fat % and get a day-by-day projection to visible abs.">
+<meta property="og:image" content="https://abscalculator.com/preview.jpg">
+<meta property="og:url" content="https://abscalculator.com">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ABS Calculator — When Will You Get Abs?">
+<meta name="twitter:description" content="Free body composition timeline. Get your exact day-by-day fat loss plan.">
+<meta name="twitter:image" content="https://abscalculator.com/preview.jpg">
+     
 <!-- ================================================
      GOOGLE ANALYTICS
      Replace G-XXXXXXXXXX with your Measurement ID.
@@ -74,10 +89,12 @@
     z-index: 1;
   }
 
-  /* Header */
+  /* =====================
+     HERO SECTION
+  ===================== */
   header {
     text-align: center;
-    padding: 60px 0 40px;
+    padding: 60px 0 0;
     position: relative;
   }
 
@@ -108,6 +125,86 @@
     color: var(--muted2);
     margin-top: 12px;
     letter-spacing: 1px;
+  }
+
+  /* Hero image strip */
+  .hero-image-wrap {
+    position: relative;
+    width: 100%;
+    margin: 36px auto 0;
+    max-width: 500px;
+    height: 320px;
+    overflow: hidden;
+  }
+
+  .hero-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+    filter: contrast(1.05) brightness(0.95);
+  }
+
+  /* fade bottom edge into site bg */
+  .hero-image-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  /* fade top edge */
+  .hero-image-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 20%;
+    background: linear-gradient(to top, transparent, var(--bg));
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Accent glow behind image */
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, rgba(0,229,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Stats ribbon overlaid on image bottom */
+  .hero-stats {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 24px;
+    z-index: 3;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
   }
 
   /* Progress steps */
@@ -830,6 +927,8 @@
     .bf-visual { grid-template-columns: repeat(3, 1fr); }
     .steps { gap: 0; }
     .step-line { min-width: 20px; }
+    .hero-image-wrap { height: 220px; }
+    .hero-stats { gap: 16px; }
   }
 </style>
 </head>
@@ -840,6 +939,30 @@
     <div class="header-tag">Body Composition Timeline Engine</div>
     <h1>ABS<br>CALC</h1>
     <p class="subtitle">Precision fat-loss forecasting // Day-by-day projection</p>
+
+    <!-- Hero image -->
+    <div class="hero-image-wrap">
+      <img
+        src="https://t3.ftcdn.net/jpg/00/86/37/02/360_F_86370226_M6LMWtYcqyLlFyhxuAr6nVz0pC9LbfHn.jpg"
+        alt="Muscular physique showing visible abs and low body fat"
+        loading="eager"
+      >
+      <div class="hero-glow"></div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val">~10%</div>
+          <div class="hero-stat-label">Body Fat</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">365</div>
+          <div class="hero-stat-label">Day Forecast</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">100%</div>
+          <div class="hero-stat-label">Free</div>
+        </div>
+      </div>
+    </div>
   </header>
 
   <!-- Step indicators -->
@@ -1259,10 +1382,8 @@ function calculate() {
   const leanMassKg = weightKg - fatMassKg;
 
   // Fat loss model
-  // 7700 kcal per kg of fat
   const fatLossPerDay = dailyDeficit / 7700; // kg/day
-  // Small muscle loss factor if deficit is aggressive
-  const muscleLossFactor = dailyDeficit > 700 ? 0.08 : 0.05; // 5-8% of deficit from lean mass
+  const muscleLossFactor = dailyDeficit > 700 ? 0.08 : 0.05;
 
   // Generate day-by-day
   allDays = [];
@@ -1288,14 +1409,12 @@ function calculate() {
 
     if (bf <= targetBF) break;
 
-    // Daily adjustment
     const fatLost = fatLossPerDay;
     const muscleLost = fatLossPerDay * muscleLossFactor;
     currentFatKg -= fatLost;
     currentLeanKg -= muscleLost;
     currentWeightKg = currentFatKg + currentLeanKg;
 
-    // Floor checks
     if (currentFatKg < 0) currentFatKg = 0;
     const minBF = gender === 'male' ? 0.04 : 0.12;
     if (currentFatKg / currentWeightKg < minBF) break;
@@ -1318,7 +1437,6 @@ function calculate() {
   document.getElementById('resultsSubtitle').textContent =
     `From ${(currentBF*100).toFixed(1)}% → ${(targetBF*100).toFixed(1)}% body fat // ~${totalDays} days // ${totalWeeks} weeks`;
 
-  // Plan items
   document.getElementById('planItems').innerHTML = `
     <div class="plan-item"><div class="plan-item-label">Starting Weight</div><div class="plan-item-val">${fmt(weightKg)}</div></div>
     <div class="plan-item"><div class="plan-item-label">Target Weight</div><div class="plan-item-val">${fmt(finalDay.weightKg)}</div></div>
@@ -1328,7 +1446,6 @@ function calculate() {
     <div class="plan-item"><div class="plan-item-label">Duration</div><div class="plan-item-val">${totalDays} days (${totalWeeks} wks)</div></div>
   `;
 
-  // Warnings
   const warnEl = document.getElementById('warningBox');
   const warnText = document.getElementById('warningText');
   let warns = [];
@@ -1343,8 +1460,6 @@ function calculate() {
     warnEl.style.display = 'none';
   }
 
-  // Milestones
-  const milestones = [];
   const q25 = allDays[Math.floor(allDays.length * 0.25)];
   const q50 = allDays[Math.floor(allDays.length * 0.5)];
   const q100 = allDays[allDays.length - 1];
@@ -1365,19 +1480,14 @@ function calculate() {
     `;
   }).join('');
 
-  // Render chart
   renderChart();
-
-  // Render table
   renderTable();
 
-  // Show results
   document.getElementById('formArea').style.display = 'none';
   document.getElementById('stepIndicators').style.display = 'none';
   document.getElementById('results').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // GA: calculation completed
   gaEvent('calculation_completed', {
     gender: gender,
     current_bf: Math.round(currentBF * 100),
@@ -1401,7 +1511,7 @@ function renderChart() {
   const sampledDays = sampleDays(allDays, 60);
 
   const labels = sampledDays.map(d => `Day ${d.day}`);
-  let data, label, color, unit2;
+  let data, label, color;
 
   if (currentChart === 'weight') {
     data = sampledDays.map(d => unit === 'kg' ? +d.weightKg.toFixed(2) : +(d.weightKg * 2.20462).toFixed(2));
@@ -1529,7 +1639,6 @@ function resetCalc() {
   document.getElementById('formArea').style.display = 'block';
   document.getElementById('stepIndicators').style.display = 'flex';
   goToSection(1);
-  // Reset step numbers
   for (let i = 1; i <= 4; i++) {
     document.getElementById('step' + i).querySelector('.step-num').textContent = `0${i}`;
   }
