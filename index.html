@@ -784,6 +784,83 @@
     .steps { gap: 0; }
     .step-line { min-width: 20px; }
   }
+/* =====================
+     LIGHT MODE
+  ===================== */
+  body.light {
+    --bg: #f0f4f5;
+    --surface: #e4eaec;
+    --surface2: #d8e2e5;
+    --border: #b8cdd2;
+    --text: #0d1f24;
+    --muted: #6a8f98;
+    --muted2: #3d6470;
+    --card: #ffffff;
+  }
+
+  body.light h1 {
+    background: linear-gradient(135deg, #0d1f24 0%, #007a99 60%, #00a854 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  body.light .section::before {
+    background: linear-gradient(90deg, #007a99, transparent);
+  }
+
+  body.light body::before {
+    background-image:
+      linear-gradient(rgba(0,100,130,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,100,130,0.06) 1px, transparent 1px);
+  }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    width: 36px;
+    padding: 10px 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.2);
+  }
+
+  .theme-toggle:hover {
+    width: 42px;
+    box-shadow: -4px 0 20px rgba(0,229,255,0.2);
+  }
+
+  .theme-toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 0.4s ease;
+  }
+
+  .theme-toggle:hover .theme-toggle-icon {
+    transform: rotate(20deg);
+  }
+
+  .theme-toggle-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--muted2);
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
 </style>
 </head>
 <body>
@@ -1001,9 +1078,10 @@
         </table>
       </div>
     </div>
-    <div class="reset-row">
-      <button class="btn-reset" onclick="resetCalc()">↺ Recalculate</button>
-    </div>
+<div class="reset-row" style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+  <button class="btn-reset" onclick="resetCalc()">↺ Recalculate</button>
+  <button class="btn-reset" onclick="downloadCSV()" style="border-color: var(--accent3); color: var(--accent3);">↓ Download Table (CSV)</button>
+</div>
   </div>
 </div>
 
@@ -1287,9 +1365,50 @@ function resetCalc() {
   for (let i = 1; i <= 4; i++) document.getElementById('step' + i).querySelector('.step-num').textContent = `0${i}`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+// --- Theme toggle ---
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
+  document.getElementById('themeLabel').textContent = isLight ? 'Dark' : 'Light';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+}
+
+// Restore saved theme on load
+(function() {
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeIcon').textContent = '🌙';
+    document.getElementById('themeLabel').textContent = 'Dark';
+  }
+})();
+// --- CSV Download ---
+function downloadCSV() {
+  const unit = document.getElementById('weightUnit').value;
+  const rows = [['Day', 'Date', `Weight (${unit})`, 'Body Fat %', `Fat Mass (${unit})`, `Lean Mass (${unit})`]];
+
+  allDays.forEach(d => {
+    const w = unit === 'kg' ? d.weightKg.toFixed(1) : (d.weightKg * 2.20462).toFixed(1);
+    const f = unit === 'kg' ? d.fatKg.toFixed(1) : (d.fatKg * 2.20462).toFixed(1);
+    const l = unit === 'kg' ? d.leanKg.toFixed(1) : (d.leanKg * 2.20462).toFixed(1);
+    rows.push([d.day, formatDate(d.date), w, d.bf.toFixed(1) + '%', f, l]);
+  });
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'abs-timeline.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
+<!-- Theme toggle button -->
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+  <span class="theme-toggle-icon" id="themeIcon">☀️</span>
+  <span class="theme-toggle-label" id="themeLabel">Light</span>
+</button>
 </body>
 </html>
